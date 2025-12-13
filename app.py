@@ -1,18 +1,24 @@
 from fastapi import FastAPI, File, UploadFile
-import uvicorn
+from fastapi.responses import JSONResponse
+import easyocr
+import numpy as np
+import cv2
 
-app = FastAPI()
+app = FastAPI(title="Gujarati OCR API")
+
+reader = easyocr.Reader(['gu'])
 
 @app.get("/")
 def root():
     return {"status": "Gujarati OCR Backend Running"}
 
-@app.post("/upload")
-async def upload_image(file: UploadFile = File(...)):
-    return {
-        "filename": file.filename,
-        "message": "File received successfully"
-    }
+@app.post("/ocr")
+async def ocr_image(file: UploadFile = File(...)):
+    image_bytes = await file.read()
+    np_img = np.frombuffer(image_bytes, np.uint8)
+    img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=10000)
+    result = reader.readtext(img, detail=0)
+    text = " ".join(result)
+
+    return JSONResponse({"text": text})
