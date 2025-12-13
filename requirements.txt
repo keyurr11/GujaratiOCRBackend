@@ -1,6 +1,6 @@
-fastapi
-uvicorn
+streamlit==1.40.1
 easyocr
-python-multipart
-torch
-torchvision
+pytesseract
+opencv-python-headless
+Pillow
+numpy
