@@ -1,6 +1,8 @@
-streamlit==1.40.1
-easyocr
-pytesseract
+fastapi
+uvicorn
+pillow
 opencv-python-headless
-Pillow
+pytesseract
+easyocr
 numpy
+python-multipart
