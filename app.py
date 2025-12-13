@@ -1,15 +1,18 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+import uvicorn
 
 app = FastAPI()
 
 @app.get("/")
 def root():
-    return {"message": "Gujarati OCR backend is running"}
+    return {"status": "Gujarati OCR Backend Running"}
 
 @app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
-    return JSONResponse({
+async def upload_image(file: UploadFile = File(...)):
+    return {
         "filename": file.filename,
-        "status": "File received successfully"
-    })
+        "message": "File received successfully"
+    }
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=10000)
