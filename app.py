@@ -1,25 +1,34 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
-import easyocr
-import numpy as np
-import cv2
+import streamlit as st
+import pytesseract
+from PIL import Image
+import tempfile
+import os
 
-app = FastAPI(title="Gujarati OCR API")
+st.set_page_config(page_title="Gujarati OCR", layout="centered")
 
-# Load Gujarati OCR model
-reader = easyocr.Reader(['gu'], gpu=False)
+st.title("📄 Gujarati OCR App")
+st.write("Upload an image and extract Gujarati text")
 
-@app.get("/")
-def home():
-    return {"status": "Gujarati OCR Backend Running"}
+# Upload image
+uploaded_file = st.file_uploader(
+    "Upload Gujarati Image",
+    type=["png", "jpg", "jpeg"]
+)
 
-@app.post("/ocr")
-async def ocr_image(file: UploadFile = File(...)):
-    image_bytes = await file.read()
-    np_img = np.frombuffer(image_bytes, np.uint8)
-    img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+if uploaded_file is not None:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        tmp.write(uploaded_file.read())
+        image_path = tmp.name
 
-    result = reader.readtext(img, detail=0)
-    text = " ".join(result)
+    image = Image.open(image_path)
+    st.image(image, caption="Uploaded Image", use_container_width=True)
 
-    return JSONResponse({"text": text})
+    st.subheader("📝 Extracted Text")
+
+    try:
+        text = pytesseract.image_to_string(image, lang="guj")
+        st.text_area("Gujarati Text", text, height=250)
+    except Exception as e:
+        st.error(f"OCR failed: {e}")
+
+    os.remove(image_path)
