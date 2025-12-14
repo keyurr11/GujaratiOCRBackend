@@ -1,34 +1,67 @@
 import streamlit as st
-import pytesseract
 from PIL import Image
-import tempfile
-import os
+import pytesseract
 
-st.set_page_config(page_title="Gujarati OCR", layout="centered")
+st.set_page_config(
+    page_title="Gujarati OCR App",
+    page_icon="📄",
+    layout="centered"
+)
 
-st.title("📄 Gujarati OCR App")
-st.write("Upload an image and extract Gujarati text")
+# ---------- CSS ----------
+st.markdown("""
+<style>
+body {
+    background-color: #0f172a;
+}
+.title {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+}
+.subtitle {
+    text-align: center;
+    color: #9ca3af;
+    margin-bottom: 30px;
+}
+.stButton>button {
+    background-color: #22c55e;
+    color: black;
+    font-size: 18px;
+    padding: 10px;
+    width: 100%;
+    border-radius: 8px;
+}
+textarea {
+    background-color: #1f2937 !important;
+    color: white !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
-# Upload image
+# ---------- HEADER ----------
+st.markdown("<div class='title'>Gujarati OCR App</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Upload an image and extract Gujarati text</div>", unsafe_allow_html=True)
+
+# ---------- FILE UPLOAD ----------
 uploaded_file = st.file_uploader(
     "Upload Gujarati Image",
     type=["png", "jpg", "jpeg"]
 )
 
-if uploaded_file is not None:
-    with tempfile.NamedTemporaryFile(delete=False) as tmp:
-        tmp.write(uploaded_file.read())
-        image_path = tmp.name
-
-    image = Image.open(image_path)
+# ---------- OCR ----------
+if uploaded_file:
+    image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image", use_container_width=True)
 
-    st.subheader("📝 Extracted Text")
-
-    try:
+    with st.spinner("Extracting text..."):
         text = pytesseract.image_to_string(image, lang="guj")
-        st.text_area("Gujarati Text", text, height=250)
-    except Exception as e:
-        st.error(f"OCR failed: {e}")
 
-    os.remove(image_path)
+    st.success("Text extracted successfully!")
+
+    st.text_area("Detected Text", text, height=200)
+
+    if st.button("Copy Text"):
+        st.write("✔ Text copied (use Ctrl + C)")
+
