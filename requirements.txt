@@ -1,7 +1,8 @@
-fastapi
-uvicorn
-easyocr
+streamlit
+pytesseract
+Pillow
 opencv-python-headless
+easyocr
 numpy
-python-multipart
-pillow
+pdf2image
+python-docx
