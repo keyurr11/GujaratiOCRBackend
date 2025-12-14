@@ -6,10 +6,11 @@ import cv2
 
 app = FastAPI(title="Gujarati OCR API")
 
-reader = easyocr.Reader(['gu'])
+# Load Gujarati OCR model
+reader = easyocr.Reader(['gu'], gpu=False)
 
 @app.get("/")
-def root():
+def home():
     return {"status": "Gujarati OCR Backend Running"}
 
 @app.post("/ocr")
